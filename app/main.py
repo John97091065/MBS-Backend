@@ -50,6 +50,11 @@ def register_admin(admin: schema.AdminCreate, db: Session = Depends(get_db)):
         raise HTTPException(status_code=400, detail="Email already registered")
     return crud.create_user(db=db, user=admin)
 
+# # Get current admin
+# @app.get("/admin/dashboard")
+# def read_admin_dashboard(admin_user = Depends(crud.get_current_admin)):
+#     return {"message": f"Welcome, {admin_user.name}"}
+
 
 #Login
 @app.post("/login", response_model=schema.UserResponse)
@@ -58,8 +63,3 @@ def login(user: schema.UserLogin, db: Session = Depends(get_db)):
     if not db_user:
         raise HTTPException(status_code=400, detail="Invalid credentials")
     return db_user
-
-# # Get current admin
-# @app.get("/admin/dashboard")
-# def read_admin_dashboard(admin_user = Depends(crud.get_current_admin)):
-#     return {"message": f"Welcome, {admin_user.name}"}
