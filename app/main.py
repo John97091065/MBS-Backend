@@ -42,7 +42,7 @@ def register(user: schema.UserCreate, db: Session = Depends(auth.get_db)):
     }
 
 #Register Admin
-@app.post("/register/admin", response_model=schema.UserResponse)
+@app.post("/admin/register", response_model=schema.UserResponse)
 def register_admin(admin: schema.AdminCreate, db: Session = Depends(auth.get_db)):
     """Register a new admin user."""
     db_user = crud.get_user_by_email(db, email=admin.email)
@@ -84,6 +84,19 @@ def read_admin_data(
 ):
     admin_user = crud.get_current_admin(db, user)
     return {"message": f"Welcome admin: {admin_user.name}"}
+
+#GET ALL USERS
+@app.get("/users", response_model=list[schema.UserResponse])
+def get_all_users(
+    db: Session = Depends(auth.get_db),
+    # user: models.User = Depends(auth.get_current_user),
+):
+    # """Get all users."""
+    # if not user.is_admin:
+    #     raise HTTPException(status_code=403, detail="Not an admin user")
+    
+    users = crud.get_all_users(db=db)
+    return users
 
 #PRODUCTS CREATE
 @app.post("/CreateProducts", response_model=schema.ProductCreate)

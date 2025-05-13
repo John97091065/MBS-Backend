@@ -53,6 +53,12 @@ def login_user(db: Session, user: schema.UserLogin):
     return db_user
 
 
+#GET ALL USERS FUNCTION
+def get_all_users(db: Session, skip: int = 0, limit: int = 100):
+    """Get all users from the database."""
+    return db.query(models.User).offset(skip).limit(limit).all()
+
+
 #GET CURRENT ADMIN FUNCTION
 def get_current_admin(db: Session, user: models.User):
     db_user = db.query(models.User).filter(models.User.id == user.id).first()
@@ -81,3 +87,20 @@ def create_product(db: Session, product: schema.ProductCreate, user: models.User
 def get_all_products(db: Session, skip: int = 0, limit: int = 100):
     """Get all products from the database."""
     return db.query(models.Product).offset(skip).limit(limit).all()
+
+
+#LIKE PRODUCT FUNCTION
+def like_product(db: Session, product_id: int, user: models.User):
+    """Like a product."""
+    db_product = db.query(models.Product).filter(models.Product.id == product_id).first()
+    if not db_product:
+        raise HTTPException(status_code=404, detail="Product not found")
+    
+    if user in db_product.liked_by:
+        db_product.liked_by.remove(user)
+    else:
+        db_product.liked_by.append(user)
+    
+    db.commit()
+    db.refresh(db_product)
+    return db_product
