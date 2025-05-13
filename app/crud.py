@@ -59,6 +59,12 @@ def get_all_users(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.User).offset(skip).limit(limit).all()
 
 
+#GET ALL ADMINS FUNCTION
+def get_all_admins(db: Session, skip: int = 0, limit: int = 100):
+    """Get all admin users from the database."""
+    return db.query(models.User).filter(models.User.is_admin == True).offset(skip).limit(limit).all()
+
+
 #GET CURRENT ADMIN FUNCTION
 def get_current_admin(db: Session, user: models.User):
     db_user = db.query(models.User).filter(models.User.id == user.id).first()
@@ -71,7 +77,7 @@ def get_current_admin(db: Session, user: models.User):
 def create_product(db: Session, product: schema.ProductCreate, user: models.User):
     """Create a new product in the database."""
     db_product = models.Product(
-        name=product.name,
+        title=product.title,
         description=product.description,
         price=product.price,
         image_url=product.image_url,

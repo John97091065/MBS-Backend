@@ -98,6 +98,19 @@ def get_all_users(
     users = crud.get_all_users(db=db)
     return users
 
+#GET ALL ADMINS
+@app.get("/admins", response_model=list[schema.UserResponse])
+def get_all_admins(
+    db: Session = Depends(auth.get_db),
+    # user: models.User = Depends(auth.get_current_user),
+):
+    # """Get all admin users."""
+    # if not user.is_admin:
+    #     raise HTTPException(status_code=403, detail="Not an admin user")
+    
+    admins = crud.get_all_admins(db=db)
+    return admins
+
 #PRODUCTS CREATE
 @app.post("/CreateProducts", response_model=schema.ProductCreate)
 def create_product(
