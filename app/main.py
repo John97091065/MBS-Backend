@@ -84,3 +84,21 @@ def read_admin_data(
 ):
     admin_user = crud.get_current_admin(db, user)
     return {"message": f"Welcome admin: {admin_user.name}"}
+
+#PRODUCTS CREATE
+@app.post("/products", response_model=schema.ProductCreate)
+def create_product(
+    product: schema.ProductCreate,
+    db: Session = Depends(auth.get_db),
+    user: models.User = Depends(auth.get_current_user),
+):
+    """Create a new product."""
+    if not user.is_admin:
+        raise HTTPException(status_code=403, detail="Not an admin user")
+    
+    new_product = crud.create_product(db=db, product=product, user=user)
+    return {
+        "message": "Product created successfully",
+        "redirect_url": "/admin/dashboard",
+        "product": new_product,
+    }

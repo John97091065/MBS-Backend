@@ -58,3 +58,24 @@ def get_current_admin(db: Session, user: models.User):
     if not db_user or not db_user.is_admin:
         raise HTTPException(status_code=403, detail="Not an admin user")
     return db_user
+
+
+#CREATE PRODUCTS FUNCTION
+def create_product(db: Session, product: schema.ProductCreate, user: models.User):
+    """Create a new product in the database."""
+    db_product = models.Product(
+        name=product.name,
+        description=product.description,
+        price=product.price,
+        image_url=product.image_url,
+        category=product.category,
+    )
+    db.add(db_product)
+    db.commit()
+    db.refresh(db_product)
+    return db_product
+
+#GET ALL PRODUCTS FUNCTION
+def get_all_products(db: Session, skip: int = 0, limit: int = 100):
+    """Get all products from the database."""
+    return db.query(models.Product).offset(skip).limit(limit).all()

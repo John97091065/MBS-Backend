@@ -8,6 +8,15 @@ class UserCreate(BaseModel):
     password: str
     is_admin: bool = False  # default to False for regular users
 
+
+#PRODUCT CREATE
+class ProductCreate(BaseModel):
+    name: str = Field(..., min_length=1, max_length=100)
+    description: str = Field(..., min_length=1, max_length=255)
+    price: int = Field(..., gt=0)  # price must be greater than 0
+    image_url: str = Field(None, max_length=255)  # optional field for image URL
+    category: str = Field(..., min_length=1, max_length=50)  # category field
+
 #ADMIN CREATE
 class AdminCreate(UserCreate):
     is_admin: bool = True  # force admin flag
