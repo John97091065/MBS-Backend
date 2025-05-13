@@ -1,6 +1,12 @@
+from fastapi import HTTPException
 from sqlalchemy.orm import Session
-from . import models, schema
+from . import models, schema, auth
+from datetime import timedelta, datetime
 from .utils import hash_password, verify_password
+from jose import jwt
+
+
+
 
 def get_user_by_email(db: Session, email: str):
     return db.query(models.User).filter(models.User.email == email).first()
@@ -8,10 +14,7 @@ def get_user_by_email(db: Session, email: str):
 def get_user_by_name(db: Session, name: str):
     return db.query(models.User).filter(models.User.name == name).first()
 
-def hash_password(plain_password: str, hashed_password: str) -> bool:
-    """Verify a plain password against a hashed password."""
-    return hash_password(plain_password) == hashed_password
-
+#CREATE USER FUNCTION
 def create_user(db: Session, user: schema.UserCreate):
     """Create a new user in the database."""
     hashed_password = hash_password(user.password)
@@ -27,6 +30,16 @@ def create_user(db: Session, user: schema.UserCreate):
     db.refresh(db_user)
     return db_user
 
+
+def create_access_token(data: dict, expires_delta: timedelta = timedelta(minutes=60)):
+    """Create a JWT access token."""
+    to_encode = data.copy()
+    expire = datetime.utcnow() + expires_delta
+    to_encode.update({"exp": expire})
+    return jwt.encode(to_encode, auth.SECRET_KEY, algorithm=auth.ALGORITHM)
+
+
+#LOGIN USER FUNCTION
 def login_user(db: Session, user: schema.UserLogin):
     print(f"Attempting login for: {user.name}")
     db_user = get_user_by_name(db, name=user.name)
@@ -39,9 +52,9 @@ def login_user(db: Session, user: schema.UserLogin):
     print("Login successful.")
     return db_user
 
-# def get_current_admin(db: Session, user: models.User):
-#     """Get the current admin user."""
-#     db_user = db.query(models.User).filter(models.User.id == user.id).first()
-#     if not db_user or not db_user.is_admin:
-#         raise HTTPException(status_code=403, detail="Not an admin user")
-#     return db_user
+#GET CURRENT ADMIN FUNCTION
+def get_current_admin(db: Session, user: models.User):
+    db_user = db.query(models.User).filter(models.User.id == user.id).first()
+    if not db_user or not db_user.is_admin:
+        raise HTTPException(status_code=403, detail="Not an admin user")
+    return db_user
