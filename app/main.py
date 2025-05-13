@@ -52,7 +52,7 @@ def register_admin(admin: schema.AdminCreate, db: Session = Depends(auth.get_db)
     new_admin = crud.create_user(db=db, user=admin)
     return {
         "message": "Admin user created successfully",
-        "redirect_url": "/admin/dashboard",
+        "redirect_url": "/admin-dashboard",
         "user": new_admin,
     }
 
@@ -67,7 +67,7 @@ def login(user: schema.UserLogin, db: Session = Depends(auth.get_db)):
 
     #Logica Redirect URL
     if db_user.is_admin:
-        redirect_url = "/admin/dashboard"
+        redirect_url = "/admin-dashboard"
     else:
         redirect_url = "/"
 
@@ -86,7 +86,7 @@ def read_admin_data(
     return {"message": f"Welcome admin: {admin_user.name}"}
 
 #PRODUCTS CREATE
-@app.post("/products", response_model=schema.ProductCreate)
+@app.post("/CreateProducts", response_model=schema.ProductCreate)
 def create_product(
     product: schema.ProductCreate,
     db: Session = Depends(auth.get_db),
@@ -99,6 +99,13 @@ def create_product(
     new_product = crud.create_product(db=db, product=product, user=user)
     return {
         "message": "Product created successfully",
-        "redirect_url": "/admin/dashboard",
+        "redirect_url": "/admin-dashboard",
         "product": new_product,
     }
+
+#VIEW ALL PRODUCTS
+@app.get("/products", response_model=list[schema.ProductCreate])
+def get_all_products(db: Session = Depends(auth.get_db)):
+    """Get all products."""
+    products = crud.get_all_products(db=db)
+    return products

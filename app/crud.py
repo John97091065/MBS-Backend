@@ -30,7 +30,7 @@ def create_user(db: Session, user: schema.UserCreate):
     db.refresh(db_user)
     return db_user
 
-
+#TOKEN CREATION
 def create_access_token(data: dict, expires_delta: timedelta = timedelta(minutes=60)):
     """Create a JWT access token."""
     to_encode = data.copy()
@@ -51,6 +51,7 @@ def login_user(db: Session, user: schema.UserLogin):
         return None
     print("Login successful.")
     return db_user
+
 
 #GET CURRENT ADMIN FUNCTION
 def get_current_admin(db: Session, user: models.User):
@@ -74,6 +75,7 @@ def create_product(db: Session, product: schema.ProductCreate, user: models.User
     db.commit()
     db.refresh(db_product)
     return db_product
+
 
 #GET ALL PRODUCTS FUNCTION
 def get_all_products(db: Session, skip: int = 0, limit: int = 100):
